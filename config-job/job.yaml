@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: config-ldap
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      serviceAccountName: redis-enterprise-operator
+      restartPolicy: Never
+      containers:
+        - name: config
+          image: alexmilowski/job-config-ldap:7
+          env:
+            - name: MY_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CLUSTER_NAME
+              value: ldap
+            - name: CLUSTER_USER
+              valueFrom:
+               secretKeyRef:
+                 name: ldap
+                 key: username
+            - name: CLUSTER_PASSWORD
+              valueFrom:
+               secretKeyRef:
+                 name: ldap
+                 key: password
+          volumeMounts:
+            - name: config
+              mountPath: "/config"
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: config-job
