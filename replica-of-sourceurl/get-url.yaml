@@ -1,12 +1,11 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: get-db-source-url
+  name: get-url
 spec:
   backoffLimit: 4
   template:
     spec:
-      serviceAccountName: redis-enterprise-operator
       restartPolicy: Never
       volumes:
         - name: scripts
@@ -53,7 +52,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: geturl
+  name: get-url
 data:
   geturl.sh: |
     CLUSTER_HOST=${CLUSTER_NAME}.${MY_NAMESPACE}${CLUSTER_SERVICE}
