@@ -3,6 +3,7 @@
 BUILDDIR=build
 TARGET_NAME=packaged
 mkdir -p $BUILDDIR/${TARGET_NAME}
+mkdir -p bin
 pip3 install . --target ${BUILDDIR}/${TARGET_NAME} --upgrade
 
 cd ${BUILDDIR}
