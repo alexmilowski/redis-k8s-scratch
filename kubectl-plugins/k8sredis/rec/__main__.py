@@ -43,10 +43,49 @@ def rec_command_status(*command_args):
          print('{}: {}'.format(str(e.status),e.reason),file=sys.stderr)
       exit(e.status)
 
+def rec_command_source_url(*args):
+   argparser = argparse.ArgumentParser(description='k8s-waitfor')
+   argparser.add_argument('--use-config',help='Use the .kubeconfig file.',action='store_true',default=False)
+   argparser.add_argument('--show-spec',help='Display the spec details.',action='store_true',default=False)
+   argparser.add_argument('--verbose',help='Verbose output',action='store_true',default=False)
+   argparser.add_argument('--namespace',help='The namespace; defaults to the context.')
+   argparser.add_argument('name',help='The object name')
+
+   args = argparser.parse_args(command_args)
+
+   namespace = bootstrap(use_config=args.use_config,namespace=args.namespace)
+
+   if namespace is None:
+      print('Cannot determine current namespace.',file=sys.stderr)
+
+   try:
+
+      core_api = client.CoreV1Api()
+      secret = core_api.read_namespaced_secret(args.name,namespace)
+
+      custom_objects = client.CustomObjectsApi()
+      api_spec = get_api('rec')
+      obj = custom_objects.get_namespaced_custom_object(api_spec['group'],api_spec['version'],namespace,api_spec['plural'],args.name)
+      status = obj.get('status',{'state':'Unknown'})
+      for key in sorted(status.keys()):
+         print('{}: {}'.format(key,status.get(key)))
+      if args.show_spec:
+         spec = obj.get('spec')
+         print(yaml.dump({'spec':spec},indent=2))
+
+
+   except ApiException as e:
+      if e.status==404:
+         print('Cannot find rec/{} in namespace {}'.format(args.name,namespace),file=sys.stderr)
+      else:
+         print('{}: {}'.format(str(e.status),e.reason),file=sys.stderr)
+      exit(e.status)
+
 
 
 commands = {
-   'status' : (rec_command_status,'Displays the status of the cluster.')
+   'status' : (rec_command_status,'Displays the status of the cluster.'),
+   'source-url' : (rec_command_source_url,'Retrieves the source url for replica-of')
 }
 
 def usage():
@@ -58,12 +97,12 @@ def usage():
    print()
 
 if __name__.rpartition('.')[-1] == "__main__":
-   if len(sys.argv) < 3:
+   if len(sys.argv) < 2:
       usage()
       exit(1)
 
-   command_name = sys.argv[2]
-   args = sys.argv[3:]
+   command_name = sys.argv[1]
+   args = sys.argv[2:]
 
    command = commands.get(command_name)
    if command is None:

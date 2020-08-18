@@ -170,12 +170,12 @@ def usage():
    print()
 
 if __name__.rpartition('.')[-1] == "__main__":
-   if len(sys.argv) < 3:
+   if len(sys.argv) < 2:
       usage()
       exit(1)
 
-   command_name = sys.argv[2]
-   args = sys.argv[3:]
+   command_name = sys.argv[1]
+   args = sys.argv[2:]
 
    command = commands.get(command_name)
    if command is None:
