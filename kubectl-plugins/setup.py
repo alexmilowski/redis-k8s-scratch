@@ -32,5 +32,5 @@ setuptools.setup(
     ],
     keywords='redis k8s kubernetes',
     python_requires='>=3.6',
-    install_requires=['kubernetes pyyaml']
+    install_requires=['kubernetes','pyyaml']
 )
