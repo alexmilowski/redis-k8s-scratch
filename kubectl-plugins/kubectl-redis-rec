@@ -1,1 +1,3 @@
-#!/usr/bin/env python3 -m k8sredis.rec
+#!/bin/bash
+python3 -m k8sredis.rec $*
+# python3 -m k8sredis.rec

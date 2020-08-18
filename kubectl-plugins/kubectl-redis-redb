@@ -1,1 +1,2 @@
-#!/usr/bin/env python3 -m k8sredis.redb
+#!/bin/bash
+python3 -m k8sredis.redb $*
