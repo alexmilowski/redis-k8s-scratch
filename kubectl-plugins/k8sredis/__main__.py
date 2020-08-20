@@ -5,7 +5,7 @@ import yaml
 
 from kubernetes import client
 from kubernetes.client.rest import ApiException
-from k8sredis.common import bootstrap, get_api
+from k8sredis.common import bootstrap, get_api, parse_parameters
 
 parmaeter_defaults = {
    'redb' : { 'memory' : '100MB', 'redisEnterpriseCluster.name' : 'rec'},
@@ -21,22 +21,6 @@ parameter_aliases = {
       'memory' : 'redisEnterpriseNodeResources.requests.memory'
    }
 }
-
-def parse_parameters(specs, defaults, aliases):
-   parameters = defaults.copy()
-   for spec in specs if specs is not None else []:
-      parts = spec.split('=')
-      if len(parts)!=2:
-         continue
-      pname = parts[0].strip()
-      pname = aliases.get(pname,pname)
-      value = parts[1].strip()
-      try:
-         value = int(value)
-      except ValueError:
-         pass
-      parameters[pname] = value
-   return parameters
 
 
 def redis_command_create(*command_args):

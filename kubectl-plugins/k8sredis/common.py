@@ -48,3 +48,19 @@ def bootstrap(use_config=False,namespace=None):
             return ns
       else:
          return None
+
+def parse_parameters(specs, defaults, aliases):
+   parameters = defaults.copy()
+   for spec in specs if specs is not None else []:
+      parts = spec.split('=')
+      if len(parts)!=2:
+         continue
+      pname = parts[0].strip()
+      pname = aliases.get(pname,pname)
+      value = parts[1].strip()
+      try:
+         value = int(value)
+      except ValueError:
+         pass
+      parameters[pname] = value
+   return parameters
