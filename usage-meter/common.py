@@ -1,6 +1,10 @@
 import os
 
 from kubernetes import client, config
+from kubernetes.client.rest import ApiException
+
+from base64 import b64decode
+
 import yaml
 
 apis = {
@@ -48,3 +52,38 @@ def bootstrap(use_config=False,namespace=None):
             return ns
       else:
          return None
+
+def get_rec_specs(namespace):
+
+   try:
+
+      custom_objects = client.CustomObjectsApi()
+      api_spec = get_api('rec')
+      obj_list = custom_objects.get_namespaced_custom_object(api_spec['group'],api_spec['version'],namespace,api_spec['plural'],'')
+
+      return [(obj_list['items'][0]['metadata']['name'],item['spec']) for item in obj_list['items']]
+
+   except ApiException as e:
+      if e.status==404:
+         return []
+      else:
+         print('{}: {}'.format(str(e.status),e.reason),file=sys.stderr)
+         return []
+
+def get_rec_api(namespace,name):
+   dns_name = name + '.' + namespace + '.svc'
+   url = 'https://' + dns_name + ':9443'
+
+   try:
+
+      api = client.CoreV1Api()
+      secret = api.read_namespaced_secret(name,namespace)
+      password = secret.data.get('password')
+      username = secret.data.get('username')
+      return url, b64decode(username).decode() if username is not None else None, b64decode(password).decode() if password is not None else None,
+
+   except ApiException as e:
+      if e.status==404:
+         return None
+      else:
+         raise e
