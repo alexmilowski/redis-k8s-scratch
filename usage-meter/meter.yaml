@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: usage-meter
+  labels:
+     app: redis-enterprise
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-enterprise
+  template:
+    metadata:
+      labels:
+        app: redis-enterprise
+    spec:
+      serviceAccountName: redis-enterprise-operator
+      containers:
+      - name: meter
+        image: alexmilowski/redis-k8s-usage-meter:2021-03-11-0004
+        env:
+          - name: INTERVAL
+            value: "60"
