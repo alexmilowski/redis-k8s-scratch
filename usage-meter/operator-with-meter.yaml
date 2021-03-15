@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-enterprise-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: redis-enterprise-operator
+  template:
+    metadata:
+      labels:
+        name: redis-enterprise-operator
+    spec:
+      serviceAccountName: redis-enterprise-operator
+      containers:
+        - name: redis-enterprise-operator
+          image: redislabs/operator:6.0.12-5
+          command:
+          - redis-enterprise-operator
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "redis-enterprise-operator"
+            - name: DATABASE_CONTROLLER_ENABLED
+              value: "true"
+          resources:
+            limits:
+              cpu: 4000m
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 256Mi
+        - name: usage-meter
+          image: alexmilowski/redis-k8s-usage-meter:2021-03-15-0001
+          imagePullPolicy: Always
+          env:
+          - name: INTERVAL
+            value: "60"
+          - name: ENDPOINT
+            value: "http://localhost:8888"
+          - name: METRICS
+            value: "--shards --report-value shards_used"
+        - name: billing-agent
+          image: alexmilowski/flask-receiver:0001
+          imagePullPolicy: Always
