@@ -21,3 +21,7 @@ spec:
         env:
           - name: INTERVAL
             value: "60"
+          - name: ENDPOINT
+            value: "http://localhost:8888"
+          - name: METRICS
+            value: "--shards --report-value shards_used"

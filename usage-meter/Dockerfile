@@ -6,6 +6,7 @@ RUN mkdir -p /app
 COPY run.sh /app/
 COPY common.py /app/
 COPY meter.py /app/
+COPY tier_pricing.py /app/
 WORKDIR /app
 
 ENTRYPOINT ["/bin/sh", "/app/run.sh"]
