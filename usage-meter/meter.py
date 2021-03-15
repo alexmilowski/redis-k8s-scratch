@@ -145,7 +145,6 @@ if __name__ == "__main__":
    argparser.add_argument('--report-value',help='The value to report',choices=['interval','cpu','memory','shards_used','shards_max'],default='interval')
    argparser.add_argument('--infer-metric-module',help='An function to compute the metric name')
    argparser.add_argument('--infer-metric-name',help='An function to compute the metric name')
-   argparser.add_argument('--metric-calc',help='The metric calculation',choices=['elapsed','shards_used','shards_max'])
 
    args = argparser.parse_args()
 
